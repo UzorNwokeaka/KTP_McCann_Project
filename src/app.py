@@ -64,7 +64,7 @@ st.set_page_config(
     page_title="Backpack Job Cost Capture", page_icon="🦺", layout="centered"
 )
 
-st.title("🦺 Backpack: Job Completion & Cost Capture")
+st.title("Backpack: Job Completion & Cost Capture")
 st.caption("Prototype screen for Operative job submission and QS cost visibility")
 
 with st.form("job_cost_form"):
