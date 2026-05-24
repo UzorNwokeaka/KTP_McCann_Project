@@ -1,6 +1,6 @@
-# KTP McCann Backpack Prototype
+# KTP McCann Backpack PoC Project
 
-This project is a prototype user interface screen for the proposed Backpack software system for J McCann & Co Ltd.
+This project is a prototype/Proof of Concept user interface for the proposed Backpack software system for J McCann & Co Ltd.
 
 The prototype allows an operative to capture job completion details, including time on site, vehicles, plant/tools, materials used, and work completed. The app calculates an estimated job cost for QS review.
 
