@@ -1,4 +1,4 @@
-# KTP McCann Backpack Prototype
+# KTP McCann Backpack PoC Project
 
 This project is a prototype user interface screen for the proposed Backpack software system for J McCann & Co Ltd.
 
