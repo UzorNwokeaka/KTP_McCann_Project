@@ -104,10 +104,10 @@ try:
             .sort_values(by="total_cost", ascending=False)
         )
 
-        st.bar_chart(
+        st.dataframe(
             cost_by_job_type,
-            x="job_type",
-            y="total_cost",
+            use_container_width=True,
+            hide_index=True,
         )
 
         st.subheader("Cost Components Summary")
