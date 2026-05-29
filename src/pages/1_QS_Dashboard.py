@@ -16,19 +16,44 @@ engine = create_engine(DATABASE_URL)
 
 st.set_page_config(
     page_title="QS Dashboard",
-    page_icon="",
+    page_icon="📊",
     layout="wide",
 )
 
-st.markdown("""
+col1, col2 = st.columns([1, 5])
+
+with col1:
+    st.image(
+        "assets/jmccann_logo.png",
+        width=120,
+    )
+
+with col2:
+    st.markdown("""
 # J. McCann & Co. Ltd
 
+**Commercial Review | Cost Visibility | Operational Performance Monitoring**
 """)
 
-st.divider()
+# col1, col2 = st.columns([1, 6])
 
-st.title("QS Operational Dashboard")
-st.caption("Commercial Review | Cost Visibility | Operational Performance Monitoring")
+# with col1:
+#     st.image(
+#         "assets/jmccann_logo.png",
+#         width=120,
+#     )
+
+# with col2:
+#     st.markdown(
+#         """
+# # J. McCann & Co. Ltd
+
+# """
+#     )
+
+# st.caption("Commercial Review | Cost Visibility | Operational Performance Monitoring")
+
+st.divider()
 
 
 def load_job_submissions():
@@ -88,27 +113,42 @@ try:
         average_cost = jobs_df["total_cost"].mean()
         total_labour_cost = jobs_df["labour_cost"].sum()
 
-        col1, col2, col3, col4 = st.columns(4)
+        st.subheader("Operational Performance Summary")
 
-        col1.metric("Total Jobs Submitted", f"{total_jobs}")
-        col2.metric("Total Estimated Cost", f"£{total_cost:,.2f}")
-        col3.metric("Average Cost per Job", f"£{average_cost:,.2f}")
-        col4.metric("Total Labour Cost", f"£{total_labour_cost:,.2f}")
+        metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+
+        metric_col1.metric("Jobs Submitted", f"{total_jobs}")
+        metric_col2.metric("Total Cost", f"£{total_cost:,.2f}")
+        metric_col3.metric("Average Job Cost", f"£{average_cost:,.2f}")
+        metric_col4.metric("Labour Cost", f"£{total_labour_cost:,.2f}")
 
         st.divider()
 
-        st.subheader("Submitted Jobs for QS Review")
+        st.subheader("Job Register")
 
-        review_columns = [
-            "id",
+        job_register_columns = [
+            "job_reference",
             "operative_name",
             "operative_employee_number",
-            "job_reference",
             "asset_id",
-            "location",
             "job_type",
+            "location",
             "hours_on_site",
-            "number_of_operatives",
+            "total_cost",
+            "qs_approved",
+            "created_at",
+        ]
+
+        st.dataframe(
+            jobs_df[job_register_columns],
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        st.subheader("Detailed Cost Records")
+
+        detailed_cost_columns = [
+            "job_reference",
             "vehicle_type",
             "tool_type",
             "tool_hours",
@@ -117,35 +157,33 @@ try:
             "tool_cost",
             "material_cost",
             "total_cost",
-            "qs_approved",
-            "created_at",
         ]
 
         st.dataframe(
-            jobs_df[review_columns],
+            jobs_df[detailed_cost_columns],
             use_container_width=True,
             hide_index=True,
         )
 
-        st.subheader("Work Completion Notes")
+        st.subheader("Work Completion Records")
+
+        work_completion_columns = [
+            "job_reference",
+            "operative_name",
+            "operative_employee_number",
+            "asset_id",
+            "location",
+            "job_type",
+            "work_completed",
+        ]
 
         st.dataframe(
-            jobs_df[
-                [
-                    "job_reference",
-                    "operative_name",
-                    "operative_employee_number",
-                    "asset_id",
-                    "location",
-                    "job_type",
-                    "work_completed",
-                ]
-            ],
+            jobs_df[work_completion_columns],
             use_container_width=True,
             hide_index=True,
         )
 
-        st.subheader("Cost Breakdown by Job Type")
+        st.subheader("Cost Analysis by Job Type")
 
         cost_by_job_type = (
             jobs_df.groupby("job_type")["total_cost"]
@@ -160,7 +198,7 @@ try:
             hide_index=True,
         )
 
-        st.subheader("Cost Components Summary")
+        st.subheader("Cost Component Analysis")
 
         cost_components = pd.DataFrame(
             {
@@ -170,7 +208,7 @@ try:
                     "Tool/Plant",
                     "Materials",
                 ],
-                "Amount": [
+                "Total Cost": [
                     jobs_df["labour_cost"].sum(),
                     jobs_df["vehicle_cost"].sum(),
                     jobs_df["tool_cost"].sum(),
@@ -185,7 +223,7 @@ try:
             hide_index=True,
         )
 
-        st.subheader("Audit Logs")
+        st.subheader("Audit Trail")
 
         st.dataframe(
             audit_df,

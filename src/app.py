@@ -82,15 +82,25 @@ st.set_page_config(
 
 init_db()
 
-st.markdown("""
+col1, col2 = st.columns([1, 5])
+
+with col1:
+    st.image(
+        "assets/jmccann_logo.png",
+        width=120,
+    )
+
+with col2:
+    st.markdown("""
 # J. McCann & Co. Ltd
 
+### Operative Operational Platform
 """)
 
 st.divider()
 
-st.title("Operative Operational Platform")
 st.caption("Suffolk Street Lighting Contract | Operative Job Capture & Cost Estimation")
+
 
 with st.form("job_cost_form"):
     st.subheader("1. Operative Details")
