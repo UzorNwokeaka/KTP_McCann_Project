@@ -7,6 +7,7 @@ try:
 except ModuleNotFoundError:
     from db import init_db, save_job_submission
 
+
 LABOUR_RATE_PER_HOUR = 30.00
 
 VEHICLE_RATES = {
@@ -74,18 +75,37 @@ def calculate_job_cost(
 
 
 st.set_page_config(
-    page_title="Backpack Job Cost Capture",
+    page_title="Operative Job Cost Capture",
     page_icon="",
     layout="centered",
 )
 
 init_db()
 
-st.title("Backpack: Job Completion & Cost Capture")
-st.caption("Prototype screen for Operative job submission and QS cost visibility")
+st.markdown("""
+# J McCann & Co. Ltd
+
+""")
+
+st.divider()
+
+st.title("Operative Operational Platform")
+st.caption("Suffolk Street Lighting Contract | Operative Job Capture & Cost Estimation")
 
 with st.form("job_cost_form"):
-    st.subheader("1. Job Details")
+    st.subheader("1. Operative Details")
+
+    operative_name = st.text_input(
+        "Operative Name",
+        placeholder="e.g. James Carter",
+    )
+
+    operative_employee_number = st.text_input(
+        "Operative Employee Number",
+        placeholder="e.g. EMP-1042",
+    )
+
+    st.subheader("2. Job Details")
 
     job_reference = st.text_input("Job Reference", placeholder="e.g. SCC-2026-00124")
     asset_id = st.text_input("Asset ID", placeholder="e.g. SL-045892")
@@ -101,10 +121,11 @@ with st.form("job_cost_form"):
         ],
     )
 
-    st.subheader("2. Time on Site")
+    st.subheader("3. Time on Site")
 
     arrival_time = st.time_input("Arrival Time", value=time(9, 0))
     departure_time = st.time_input("Departure Time", value=time(11, 30))
+
     number_of_operatives = st.number_input(
         "Number of Operatives",
         min_value=1,
@@ -119,7 +140,7 @@ with st.form("job_cost_form"):
 
     st.info(f"Calculated time on site: {hours_on_site} hours")
 
-    st.subheader("3. Resources Used")
+    st.subheader("4. Resources Used")
 
     vehicle_type = st.selectbox("Vehicle Used", list(VEHICLE_RATES.keys()))
     tool_type = st.selectbox("Plant/Tool Used", list(TOOL_RATES.keys()))
@@ -128,17 +149,18 @@ with st.form("job_cost_form"):
         "Tool Hours Used",
         min_value=0.0,
         max_value=24.0,
-        value=hours_on_site,
+        value=0.0,
         step=0.5,
+        key="tool_hours_used",
     )
 
-    st.subheader("4. Materials Used")
+    st.subheader("5. Materials Used")
 
     lamp_qty = st.number_input("Lamp Units Used", min_value=0, value=1)
     cable_qty = st.number_input("Cable Used - metres", min_value=0, value=3)
     fuse_qty = st.number_input("Fuses Used", min_value=0, value=1)
 
-    st.subheader("5. Work Completed")
+    st.subheader("6. Work Completed")
 
     work_completed = st.text_area(
         "Description of Work Completed",
@@ -150,6 +172,12 @@ with st.form("job_cost_form"):
 
 if submitted:
     errors = []
+
+    if not operative_name:
+        errors.append("Operative name is required.")
+
+    if not operative_employee_number:
+        errors.append("Operative employee number is required.")
 
     if not job_reference:
         errors.append("Job reference is required.")
@@ -165,6 +193,11 @@ if submitted:
 
     if hours_on_site <= 0:
         errors.append("Valid arrival and departure times are required.")
+
+    if tool_hours > hours_on_site:
+        errors.append(
+            f"Tool hours used cannot exceed time on site ({hours_on_site} hours)."
+        )
 
     if errors:
         st.error("Please correct the following issues:")
@@ -183,6 +216,8 @@ if submitted:
         )
 
         job_data = {
+            "operative_name": operative_name,
+            "operative_employee_number": operative_employee_number,
             "job_reference": job_reference,
             "asset_id": asset_id,
             "location": location,
@@ -230,23 +265,26 @@ if submitted:
 
             st.subheader("Job Summary for QS Review")
 
-            st.write(
-                {
-                    "Database ID": saved_job_id,
-                    "Job Reference": job_reference,
-                    "Asset ID": asset_id,
-                    "Location": location,
-                    "Job Type": job_type,
-                    "Arrival Time": str(arrival_time),
-                    "Departure Time": str(departure_time),
-                    "Hours on Site": hours_on_site,
-                    "Number of Operatives": number_of_operatives,
-                    "Vehicle": vehicle_type,
-                    "Tool/Plant": tool_type,
-                    "Work Completed": work_completed,
-                    "Total Estimated Cost": f"£{cost['total_cost']:,.2f}",
-                }
-            )
+            st.markdown(f"""
+**Database ID:** {saved_job_id}  
+**Operative Name:** {operative_name}  
+**Employee Number:** {operative_employee_number}  
+**Job Reference:** {job_reference}  
+**Asset ID:** {asset_id}  
+**Location:** {location}  
+**Job Type:** {job_type}  
+**Arrival Time:** {arrival_time}  
+**Departure Time:** {departure_time}  
+**Hours on Site:** {hours_on_site}  
+**Number of Operatives:** {number_of_operatives}  
+**Vehicle:** {vehicle_type}  
+**Tool/Plant:** {tool_type}  
+**Tool Hours Used:** {tool_hours}  
+**Total Estimated Cost:** £{cost['total_cost']:,.2f}
+
+**Work Completed:**  
+{work_completed}
+""")
 
         except Exception as error:
             st.error("The job cost was calculated, but it could not be saved.")

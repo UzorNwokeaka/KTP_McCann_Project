@@ -20,22 +20,33 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("QS Dashboard")
-st.caption("Review submitted job costs, audit records, and operational cost trends.")
+st.markdown("""
+# J McCann & Co. Ltd
+
+""")
+
+st.divider()
+
+st.title("QS Operational Dashboard")
+st.caption("Commercial Review | Cost Visibility | Operational Performance Monitoring")
 
 
 def load_job_submissions():
     query = """
     SELECT
         id,
+        operative_name,
+        operative_employee_number,
         job_reference,
         asset_id,
         location,
         job_type,
+        work_completed,
         hours_on_site,
         number_of_operatives,
         vehicle_type,
         tool_type,
+        tool_hours,
         labour_cost,
         vehicle_cost,
         tool_cost,
@@ -76,7 +87,6 @@ try:
         total_cost = jobs_df["total_cost"].sum()
         average_cost = jobs_df["total_cost"].mean()
         total_labour_cost = jobs_df["labour_cost"].sum()
-        total_material_cost = jobs_df["material_cost"].sum()
 
         col1, col2, col3, col4 = st.columns(4)
 
@@ -89,8 +99,48 @@ try:
 
         st.subheader("Submitted Jobs for QS Review")
 
+        review_columns = [
+            "id",
+            "operative_name",
+            "operative_employee_number",
+            "job_reference",
+            "asset_id",
+            "location",
+            "job_type",
+            "hours_on_site",
+            "number_of_operatives",
+            "vehicle_type",
+            "tool_type",
+            "tool_hours",
+            "labour_cost",
+            "vehicle_cost",
+            "tool_cost",
+            "material_cost",
+            "total_cost",
+            "qs_approved",
+            "created_at",
+        ]
+
         st.dataframe(
-            jobs_df,
+            jobs_df[review_columns],
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        st.subheader("Work Completion Notes")
+
+        st.dataframe(
+            jobs_df[
+                [
+                    "job_reference",
+                    "operative_name",
+                    "operative_employee_number",
+                    "asset_id",
+                    "location",
+                    "job_type",
+                    "work_completed",
+                ]
+            ],
             use_container_width=True,
             hide_index=True,
         )
