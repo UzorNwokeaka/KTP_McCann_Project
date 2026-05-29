@@ -21,7 +21,7 @@ st.set_page_config(
 )
 
 st.markdown("""
-# J McCann & Co. Ltd
+# J. McCann & Co. Ltd
 
 """)
 
